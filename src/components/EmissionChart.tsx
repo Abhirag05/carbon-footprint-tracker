@@ -22,14 +22,14 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
     }
 
     // Sort data by date
-    const sortedData = [...data].sort((a, b) => 
+    const sortedData = [...data].sort((a, b) =>
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     // Format labels based on period
     const labels = sortedData.map((item) => {
       const date = new Date(item.date);
-      
+
       switch (period) {
         case 'week':
           // Show day of week (Mon, Tue, etc.)
@@ -52,7 +52,7 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
       datasets: [
         {
           data: values,
-          color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`, // Green color
+          color: (opacity = 1) => `rgba(155, 3, 2, ${opacity})`, // Red color
           strokeWidth: 2,
         },
       ],
@@ -67,7 +67,7 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#ffffff',
     decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+    color: (opacity = 1) => `rgba(155, 3, 2, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: {
       borderRadius: 16,
@@ -75,12 +75,15 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: '#4CAF50',
+      stroke: '#9b0302',
     },
     propsForBackgroundLines: {
       strokeDasharray: '', // solid background lines
       stroke: '#e0e0e0',
       strokeWidth: 1,
+    },
+    propsForLabels: {
+      fontSize: 10,
     },
   };
 
@@ -99,8 +102,8 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
     <View style={styles.container}>
       <LineChart
         data={chartData}
-        width={screenWidth - 32}
-        height={220}
+        width={screenWidth - 64}
+        height={240}
         chartConfig={chartConfig}
         bezier
         style={styles.chart}
@@ -113,6 +116,7 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
         yAxisSuffix=" kg"
         yAxisInterval={1}
         fromZero={true}
+        segments={4}
       />
     </View>
   );
@@ -130,10 +134,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    overflow: 'hidden',
   },
   chart: {
     marginVertical: 8,
     borderRadius: 16,
+    marginLeft: -16,
   },
   emptyState: {
     alignItems: 'center',

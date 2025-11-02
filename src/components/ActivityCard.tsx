@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, IconButton } from 'react-native-paper';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Activity, ActivityType } from '../types';
-import { lightHaptic, heavyHaptic } from '../utils/haptics';
 import { colors, spacing, shadows, borderRadius } from '../theme/theme';
 
 interface ActivityCardProps {
@@ -99,23 +98,13 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress, onDelete
     return activity.description;
   };
 
-  const handleDelete = () => {
-    heavyHaptic();
-    onDelete?.(activity.id);
-  };
-
-  const handlePress = () => {
-    lightHaptic();
-    onPress?.(activity);
-  };
-
   const renderRightActions = () => (
     <View style={styles.deleteAction}>
       <IconButton
         icon="delete"
         iconColor="#fff"
         size={24}
-        onPress={handleDelete}
+        onPress={() => onDelete?.(activity.id)}
       />
     </View>
   );
@@ -123,7 +112,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress, onDelete
   const cardContent = (
     <Card style={styles.card} mode="elevated">
       <TouchableOpacity
-        onPress={handlePress}
+        onPress={() => onPress?.(activity)}
         activeOpacity={0.7}
       >
         <Card.Content style={styles.cardContent}>

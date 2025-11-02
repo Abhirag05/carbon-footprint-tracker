@@ -14,7 +14,6 @@ import {
   Card
 } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
-import { lightHaptic, successHaptic, errorHaptic } from '../utils/haptics';
 import { colors, spacing, shadows, borderRadius } from '../theme/theme';
 
 const AuthScreen: React.FC = () => {
@@ -76,8 +75,6 @@ const AuthScreen: React.FC = () => {
    * Handle form submission
    */
   const handleSubmit = async () => {
-    lightHaptic();
-
     // Clear previous errors
     clearError();
 
@@ -87,21 +84,17 @@ const AuthScreen: React.FC = () => {
     const isConfirmPasswordValid = validateConfirmPassword();
 
     if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
-      errorHaptic();
       return;
     }
 
     try {
       if (isLogin) {
         await login(email.trim(), password);
-        successHaptic();
       } else {
         await register(email.trim(), password);
-        successHaptic();
       }
       // Navigation will be handled automatically by AuthContext
     } catch (error) {
-      errorHaptic();
       // Error is already set in context and displayed
       console.error('Authentication error:', error);
     }
@@ -111,7 +104,6 @@ const AuthScreen: React.FC = () => {
    * Toggle between login and registration modes
    */
   const toggleMode = () => {
-    lightHaptic();
     setIsLogin(!isLogin);
     clearError();
     setEmailError('');

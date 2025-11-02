@@ -9,7 +9,6 @@ import { useActivity } from '../context/ActivityContext';
 import { useAuth } from '../context/AuthContext';
 import { calculateEmissions } from '../services/calculationService';
 import { validateActivity } from '../utils/validators';
-import { lightHaptic, successHaptic, errorHaptic, warningHaptic } from '../utils/haptics';
 
 const AddActivityScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -23,11 +22,9 @@ const AddActivityScreen: React.FC = () => {
 
   const handleSubmit = async (data: { type: ActivityType; date: Date; details: any }) => {
     try {
-      lightHaptic();
       setLoading(true);
 
       if (!user) {
-        errorHaptic();
         Alert.alert('Error', 'You must be logged in to save activities');
         setLoading(false);
         return;
@@ -36,7 +33,6 @@ const AddActivityScreen: React.FC = () => {
       // Validate activity data
       const validation = validateActivity(data.type, data.details);
       if (!validation.valid) {
-        warningHaptic();
         Alert.alert('Validation Error', validation.errors.join('\n'));
         setLoading(false);
         return;
@@ -60,7 +56,6 @@ const AddActivityScreen: React.FC = () => {
       await addActivity(activityData);
 
       // Show success message
-      successHaptic();
       const message = isConnected
         ? 'Activity saved successfully!'
         : 'Activity saved offline. Will sync when online.';
@@ -74,7 +69,6 @@ const AddActivityScreen: React.FC = () => {
       }, 1500);
 
     } catch (error) {
-      errorHaptic();
       console.error('Error saving activity:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to save activity';
       Alert.alert('Error', errorMessage);
@@ -126,6 +120,13 @@ const AddActivityScreen: React.FC = () => {
               },
             ]}
             style={styles.segmentedButtons}
+            theme={{
+              colors: {
+                secondaryContainer: '#0c2d55',
+                onSecondaryContainer: '#ffffff',
+                onSurface: '#000000',
+              },
+            }}
           />
           <SegmentedButtons
             value={activityType}
@@ -143,6 +144,13 @@ const AddActivityScreen: React.FC = () => {
               },
             ]}
             style={styles.segmentedButtons}
+            theme={{
+              colors: {
+                secondaryContainer: '#0c2d55',
+                onSecondaryContainer: '#ffffff',
+                onSurface: '#000000',
+              },
+            }}
           />
         </View>
 

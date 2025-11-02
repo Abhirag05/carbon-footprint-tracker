@@ -229,6 +229,13 @@ const ActivityLogScreen: React.FC = () => {
               onPress={() => handleTypeFilter(ACTIVITY_TYPES.TRANSPORTATION as ActivityType)}
               style={styles.chip}
               icon="car"
+              selectedColor="#ffffff"
+              theme={{
+                colors: {
+                  secondaryContainer: '#0c2d55',
+                  onSecondaryContainer: '#ffffff',
+                },
+              }}
             >
               Transport
             </Chip>
@@ -237,6 +244,13 @@ const ActivityLogScreen: React.FC = () => {
               onPress={() => handleTypeFilter(ACTIVITY_TYPES.ENERGY as ActivityType)}
               style={styles.chip}
               icon="lightning-bolt"
+              selectedColor="#ffffff"
+              theme={{
+                colors: {
+                  secondaryContainer: '#0c2d55',
+                  onSecondaryContainer: '#ffffff',
+                },
+              }}
             >
               Energy
             </Chip>
@@ -245,6 +259,13 @@ const ActivityLogScreen: React.FC = () => {
               onPress={() => handleTypeFilter(ACTIVITY_TYPES.FOOD as ActivityType)}
               style={styles.chip}
               icon="food-apple"
+              selectedColor="#ffffff"
+              theme={{
+                colors: {
+                  secondaryContainer: '#0c2d55',
+                  onSecondaryContainer: '#ffffff',
+                },
+              }}
             >
               Food
             </Chip>
@@ -253,6 +274,13 @@ const ActivityLogScreen: React.FC = () => {
               onPress={() => handleTypeFilter(ACTIVITY_TYPES.WASTE as ActivityType)}
               style={styles.chip}
               icon="delete"
+              selectedColor="#ffffff"
+              theme={{
+                colors: {
+                  secondaryContainer: '#0c2d55',
+                  onSecondaryContainer: '#ffffff',
+                },
+              }}
             >
               Waste
             </Chip>

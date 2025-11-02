@@ -1,14 +1,15 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeScreen from '../screens/HomeScreen';
 import ActivityLogScreen from '../screens/ActivityLogScreen';
 import AddActivityScreen from '../screens/AddActivityScreen';
 import InsightsScreen from '../screens/InsightsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors, shadows } from '../theme/theme';
-import { lightHaptic } from '../utils/haptics';
+import { useAuth } from '../context/AuthContext';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -25,9 +26,39 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
  * Provides access to all main app screens
  */
 const MainTabNavigator: React.FC = () => {
-  const handleTabPress = () => {
-    lightHaptic();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+            } catch (error) {
+              console.error('Logout error:', error);
+            }
+          },
+        },
+      ]
+    );
   };
+
+  const CustomHeader = () => (
+    <SafeAreaView edges={['top']} style={styles.safeArea}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>MarianTrack</Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <MaterialCommunityIcons name="logout" size={24} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
 
   return (
     <Tab.Navigator
@@ -52,21 +83,14 @@ const MainTabNavigator: React.FC = () => {
           ...shadows.md,
         },
         headerTintColor: '#ffffff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-          fontSize: 18,
-        },
         animation: 'shift',
-      }}
-      screenListeners={{
-        tabPress: handleTabPress,
+        header: () => <CustomHeader />,
       }}
     >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'Dashboard',
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" size={size} color={color} />
@@ -77,7 +101,6 @@ const MainTabNavigator: React.FC = () => {
         name="ActivityLog"
         component={ActivityLogScreen}
         options={{
-          title: 'Activity Log',
           tabBarLabel: 'Log',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="format-list-bulleted" size={size} color={color} />
@@ -88,7 +111,6 @@ const MainTabNavigator: React.FC = () => {
         name="AddActivity"
         component={AddActivityScreen}
         options={{
-          title: 'Add Activity',
           tabBarLabel: 'Add',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
@@ -99,7 +121,6 @@ const MainTabNavigator: React.FC = () => {
         name="Insights"
         component={InsightsScreen}
         options={{
-          title: 'Insights',
           tabBarLabel: 'Insights',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="lightbulb-on" size={size} color={color} />
@@ -110,7 +131,6 @@ const MainTabNavigator: React.FC = () => {
         name="Profile"
         component={ProfileScreen}
         options={{
-          title: 'Profile',
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" size={size} color={color} />
@@ -120,5 +140,29 @@ const MainTabNavigator: React.FC = () => {
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: colors.primary,
+    ...shadows.md,
+  },
+  headerContainer: {
+    backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerTitle: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  logoutButton: {
+    padding: 8,
+  },
+});
 
 export default MainTabNavigator;

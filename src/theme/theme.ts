@@ -5,17 +5,17 @@ import { DefaultTheme as NavigationLightTheme, DarkTheme as NavigationDarkTheme 
  * Custom color palette for the Carbon Footprint Tracker app
  */
 export const colors = {
-    primary: '#4CAF50',
-    primaryDark: '#388E3C',
-    primaryLight: '#81C784',
-    secondary: '#2196F3',
-    secondaryDark: '#1976D2',
-    secondaryLight: '#64B5F6',
+    primary: '#9b0302',
+    primaryDark: '#7a0201',
+    primaryLight: '#c41f1e',
+    secondary: '#0c2d55',
+    secondaryDark: '#081f3d',
+    secondaryLight: '#1a4a7e',
     accent: '#FF9800',
     error: '#F44336',
     warning: '#FF9800',
-    success: '#4CAF50',
-    info: '#2196F3',
+    success: '#9b0302',
+    info: '#0c2d55',
     background: '#FFFFFF',
     surface: '#FFFFFF',
     text: '#212121',
@@ -26,19 +26,19 @@ export const colors = {
     divider: '#E0E0E0',
 
     // Emission category colors
-    transportation: '#2196F3',
+    transportation: '#0c2d55',
     energy: '#FF9800',
-    food: '#4CAF50',
+    food: '#9b0302',
     waste: '#9C27B0',
 
     // Chart colors
-    chartPrimary: '#4CAF50',
-    chartSecondary: '#2196F3',
+    chartPrimary: '#9b0302',
+    chartSecondary: '#0c2d55',
     chartTertiary: '#FF9800',
     chartQuaternary: '#9C27B0',
 
     // Status colors
-    synced: '#4CAF50',
+    synced: '#9b0302',
     pending: '#FF9800',
     offline: '#757575',
 };

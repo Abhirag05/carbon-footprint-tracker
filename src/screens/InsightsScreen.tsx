@@ -74,9 +74,9 @@ const InsightsScreen: React.FC = () => {
   // Prepare pie chart data
   const pieChartData = useMemo(() => {
     const colors = {
-      transportation: '#1976d2',
+      transportation: '#0c2d55',
       energy: '#f57c00',
-      food: '#388e3c',
+      food: '#9b0302',
       waste: '#7b1fa2',
     };
 
@@ -154,6 +154,13 @@ const InsightsScreen: React.FC = () => {
                   { value: 'week', label: 'Week' },
                   { value: 'month', label: 'Month' },
                 ]}
+                theme={{
+                  colors: {
+                    secondaryContainer: '#0c2d55',
+                    onSecondaryContainer: '#ffffff',
+                    onSurface: '#0c2d55',
+                  },
+                }}
               />
             </View>
 
@@ -182,7 +189,7 @@ const InsightsScreen: React.FC = () => {
                     size={32}
                     color={
                       comparison.change < 0
-                        ? '#2e7d32'
+                        ? '#9b0302'
                         : comparison.change > 0
                           ? '#d32f2f'
                           : '#666'
@@ -201,7 +208,7 @@ const InsightsScreen: React.FC = () => {
                     style={[
                       styles.changeText,
                       {
-                        color: comparison.percentageChange < 0 ? '#2e7d32' : '#d32f2f',
+                        color: comparison.percentageChange < 0 ? '#9b0302' : '#d32f2f',
                       },
                     ]}
                   >
@@ -298,7 +305,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: '#9b0302',
   },
   headerSubtitle: {
     fontSize: 14,
@@ -390,6 +397,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 4,
+    color: '#9b0302',
   },
   sectionSubtitle: {
     fontSize: 14,

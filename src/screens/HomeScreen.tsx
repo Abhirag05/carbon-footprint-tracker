@@ -186,7 +186,6 @@ const HomeScreen: React.FC = () => {
                 Track your environmental impact
               </Paragraph>
             </View>
-            <SyncStatusIndicator status={syncStatus} pendingCount={pendingCount} />
           </View>
         </View>
 
@@ -237,6 +236,14 @@ const HomeScreen: React.FC = () => {
               { value: 'week', label: 'Week' },
               { value: 'month', label: 'Month' },
             ]}
+            style={styles.segmentedButtons}
+            theme={{
+              colors: {
+                secondaryContainer: '#0c2d55',
+                onSecondaryContainer: '#ffffff',
+                onSurface: '#0c2d55',
+              },
+            }}
           />
         </View>
 
@@ -322,7 +329,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: '#9b0302',
   },
   headerSubtitle: {
     fontSize: 14,
@@ -348,7 +355,7 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: '#9b0302',
   },
   summaryUnit: {
     fontSize: 10,
@@ -358,6 +365,9 @@ const styles = StyleSheet.create({
   periodSelector: {
     paddingHorizontal: 16,
     marginBottom: 8,
+  },
+  segmentedButtons: {
+    backgroundColor: '#ffffff',
   },
   quickActionContainer: {
     paddingHorizontal: 16,
@@ -382,9 +392,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#9b0302',
   },
   viewAllText: {
-    color: '#2e7d32',
+    color: '#9b0302',
     fontSize: 14,
     fontWeight: '600',
   },
