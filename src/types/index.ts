@@ -30,7 +30,7 @@ export interface Insight {
   data?: any;
 }
 
-export type ChartPeriod = 'week' | 'month' | 'year';
+export type ChartPeriod = 'day' | 'week' | 'month' | 'year';
 export type ChartType = 'line' | 'bar' | 'pie';
 
 export interface EmissionData {
