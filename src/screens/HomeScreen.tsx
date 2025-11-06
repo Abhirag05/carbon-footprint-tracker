@@ -98,12 +98,13 @@ const HomeScreen: React.FC = () => {
         dataMap.set(key, 0);
       }
     } else if (selectedPeriod === 'month') {
-      // Last 30 days
-      for (let i = 29; i >= 0; i--) {
+      // Last 12 months (Jan to Dec or current month back 12 months)
+      for (let i = 11; i >= 0; i--) {
         const date = new Date(now);
-        date.setDate(now.getDate() - i);
+        date.setMonth(now.getMonth() - i);
+        date.setDate(1); // First day of month
         date.setHours(0, 0, 0, 0);
-        const key = date.toISOString().split('T')[0];
+        const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
         dataMap.set(key, 0);
       }
     }
@@ -116,14 +117,16 @@ const HomeScreen: React.FC = () => {
       if (selectedPeriod === 'day') {
         // Group by hour
         key = activityDate.toISOString().split('T')[0] + 'T' + activityDate.getHours().toString().padStart(2, '0');
+      } else if (selectedPeriod === 'month') {
+        // Group by month (YYYY-MM format)
+        key = `${activityDate.getFullYear()}-${(activityDate.getMonth() + 1).toString().padStart(2, '0')}`;
       } else {
-        // Group by day
+        // Group by day (for week view)
         key = activityDate.toISOString().split('T')[0];
       }
 
-      if (dataMap.has(key)) {
-        dataMap.set(key, (dataMap.get(key) || 0) + activity.emissionKg);
-      }
+      // Add to existing value or set new value
+      dataMap.set(key, (dataMap.get(key) || 0) + activity.emissionKg);
     });
 
     // Convert map to array and format for chart
@@ -232,7 +235,6 @@ const HomeScreen: React.FC = () => {
             value={selectedPeriod}
             onValueChange={(value) => setSelectedPeriod(value as ChartPeriod)}
             buttons={[
-              { value: 'day', label: 'Day' },
               { value: 'week', label: 'Week' },
               { value: 'month', label: 'Month' },
             ]}

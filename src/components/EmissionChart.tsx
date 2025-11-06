@@ -26,17 +26,46 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
+    // Limit data points and format labels based on period to avoid congestion
+    let skipLabels = 1;
+
+    switch (period) {
+      case 'day':
+        // For day view, show only last 24 hours with hourly intervals
+        // If more than 12 data points, show every other label
+        if (sortedData.length > 12) {
+          skipLabels = Math.ceil(sortedData.length / 12);
+        }
+        break;
+      case 'week':
+        // Week view is fine, show all 7 days
+        skipLabels = 1;
+        break;
+      case 'month':
+        // For month view, always show all 12 months (Jan to Dec)
+        skipLabels = 1;
+        break;
+    }
+
     // Format labels based on period
-    const labels = sortedData.map((item) => {
+    const labels = sortedData.map((item, index) => {
+      // Only show label at intervals to avoid congestion
+      if (index % skipLabels !== 0 && index !== sortedData.length - 1) {
+        return '';
+      }
+
       const date = new Date(item.date);
 
       switch (period) {
+        case 'day':
+          // Show hour (12am, 6am, 12pm, etc.)
+          return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
         case 'week':
           // Show day of week (Mon, Tue, etc.)
           return date.toLocaleDateString('en-US', { weekday: 'short' });
         case 'month':
-          // Show day of month (1, 2, 3, etc.)
-          return date.getDate().toString();
+          // Show month names (Jan, Feb, Mar, etc.) - always show all 12 months
+          return date.toLocaleDateString('en-US', { month: 'short' });
         case 'year':
           // Show month (Jan, Feb, etc.)
           return date.toLocaleDateString('en-US', { month: 'short' });
@@ -83,7 +112,8 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
       strokeWidth: 1,
     },
     propsForLabels: {
-      fontSize: 10,
+      fontSize: 11,
+      fontWeight: '500',
     },
   };
 
@@ -103,7 +133,7 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
       <LineChart
         data={chartData}
         width={screenWidth - 64}
-        height={240}
+        height={260}
         chartConfig={chartConfig}
         bezier
         style={styles.chart}
@@ -111,12 +141,14 @@ const EmissionChart: React.FC<EmissionChartProps> = ({ data, period, chartType }
         withOuterLines={true}
         withVerticalLabels={true}
         withHorizontalLabels={true}
-        withDots={true}
+        withDots={data.length <= 15}
         withShadow={false}
         yAxisSuffix=" kg"
         yAxisInterval={1}
         fromZero={true}
         segments={4}
+        verticalLabelRotation={period === 'month' && data.length > 20 ? 30 : 0}
+        xLabelsOffset={-10}
       />
     </View>
   );

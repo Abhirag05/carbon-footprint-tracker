@@ -137,11 +137,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress, onDelete
           <View style={styles.rightSection}>
             <Text style={styles.emissionValue}>{activity.emissionKg.toFixed(1)}</Text>
             <Text style={styles.emissionUnit}>kg CO₂</Text>
-            {!activity.synced && (
-              <View style={styles.syncBadge}>
-                <Text style={styles.syncBadgeText}>Pending</Text>
-              </View>
-            )}
           </View>
         </Card.Content>
       </TouchableOpacity>

@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Alert,
-  Share,
-  Platform,
 } from 'react-native';
 import {
   Card,
@@ -14,80 +12,21 @@ import {
   Paragraph,
   Button,
   List,
-  Switch,
-  Divider,
   Portal,
   Dialog,
-  RadioButton,
 } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { useAuth } from '../context/AuthContext';
 import { useActivity } from '../context/ActivityContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SyncStatusIndicator from '../components/SyncStatusIndicator';
-import { getPendingActivityCount } from '../services/syncService';
-
-interface UserPreferences {
-  units: 'metric' | 'imperial';
-  notifications: boolean;
-}
-
-const PREFERENCES_KEY = '@carbon_tracker_preferences';
 
 const ProfileScreen: React.FC = () => {
   const { user, logout } = useAuth();
-  const { activities, syncStatus, syncPendingActivities, isConnected } = useActivity();
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    units: 'metric',
-    notifications: false,
-  });
+  const { activities } = useActivity();
   const [logoutDialogVisible, setLogoutDialogVisible] = useState(false);
-  const [unitsDialogVisible, setUnitsDialogVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
-
-  // Load preferences on mount
-  useEffect(() => {
-    loadPreferences();
-  }, []);
-
-  // Save preferences whenever they change
-  useEffect(() => {
-    savePreferences();
-  }, [preferences]);
-
-  // Update pending count periodically
-  useEffect(() => {
-    const updatePendingCount = async () => {
-      const count = await getPendingActivityCount();
-      setPendingCount(count);
-    };
-
-    updatePendingCount();
-    const interval = setInterval(updatePendingCount, 5000); // Update every 5 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadPreferences = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(PREFERENCES_KEY);
-      if (stored) {
-        setPreferences(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-    }
-  };
-
-  const savePreferences = async () => {
-    try {
-      await AsyncStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
-    } catch (error) {
-      console.error('Error saving preferences:', error);
-    }
-  };
+  const [exporting, setExporting] = useState(false);
 
   const handleLogout = async () => {
     setLogoutDialogVisible(false);
@@ -102,76 +41,245 @@ const ProfileScreen: React.FC = () => {
   };
 
   const handleExportData = async () => {
+    setExporting(true);
     try {
-      // Convert activities to CSV format
-      const csvHeader = 'Date,Type,Description,Emissions (kg CO2),Synced\n';
-      const csvRows = activities.map((activity) => {
-        const date = new Date(activity.date).toISOString().split('T')[0];
-        const type = activity.type;
-        const description = activity.description.replace(/,/g, ';'); // Replace commas to avoid CSV issues
-        const emissions = activity.emissionKg.toFixed(2);
-        const synced = activity.synced ? 'Yes' : 'No';
-        return `${date},${type},${description},${emissions},${synced}`;
-      }).join('\n');
-
-      const csvContent = csvHeader + csvRows;
-
-      // Create a summary
+      // Calculate statistics
       const totalEmissions = activities.reduce((sum, a) => sum + a.emissionKg, 0);
-      const summary = `Carbon Footprint Data Export\n` +
-        `User: ${user?.email}\n` +
-        `Export Date: ${new Date().toLocaleDateString()}\n` +
-        `Total Activities: ${activities.length}\n` +
-        `Total Emissions: ${totalEmissions.toFixed(2)} kg CO2\n\n` +
-        `${csvContent}`;
+      const avgEmissions = activities.length > 0 ? totalEmissions / activities.length : 0;
 
-      // Share the data
-      await Share.share({
-        message: summary,
-        title: 'Carbon Footprint Data',
-      });
+      // Group by type
+      const byType = activities.reduce((acc, activity) => {
+        acc[activity.type] = (acc[activity.type] || 0) + activity.emissionKg;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Sort activities by date (most recent first)
+      const sortedActivities = [...activities].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+
+      // Generate HTML for PDF
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Carbon Footprint Report</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                color: #333;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 3px solid #9b0302;
+                padding-bottom: 20px;
+              }
+              .header h1 {
+                color: #9b0302;
+                margin: 0;
+                font-size: 28px;
+              }
+              .header p {
+                color: #666;
+                margin: 5px 0;
+              }
+              .summary {
+                background-color: #f5f5f5;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 30px;
+              }
+              .summary h2 {
+                color: #9b0302;
+                margin-top: 0;
+                font-size: 20px;
+              }
+              .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-top: 15px;
+              }
+              .stat-box {
+                background: white;
+                padding: 15px;
+                border-radius: 6px;
+                border-left: 4px solid #9b0302;
+              }
+              .stat-label {
+                color: #666;
+                font-size: 12px;
+                text-transform: uppercase;
+              }
+              .stat-value {
+                color: #9b0302;
+                font-size: 24px;
+                font-weight: bold;
+                margin-top: 5px;
+              }
+              .breakdown {
+                margin-bottom: 30px;
+              }
+              .breakdown h2 {
+                color: #9b0302;
+                font-size: 20px;
+              }
+              .breakdown-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border-bottom: 1px solid #e0e0e0;
+              }
+              .breakdown-item:last-child {
+                border-bottom: none;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+              }
+              th {
+                background-color: #9b0302;
+                color: white;
+                padding: 12px;
+                text-align: left;
+                font-size: 14px;
+              }
+              td {
+                padding: 10px 12px;
+                border-bottom: 1px solid #e0e0e0;
+                font-size: 13px;
+              }
+              tr:nth-child(even) {
+                background-color: #f9f9f9;
+              }
+              .footer {
+                margin-top: 40px;
+                text-align: center;
+                color: #999;
+                font-size: 12px;
+                border-top: 1px solid #e0e0e0;
+                padding-top: 20px;
+              }
+              .type-badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: bold;
+                text-transform: uppercase;
+              }
+              .type-transportation { background-color: #0c2d55; color: white; }
+              .type-energy { background-color: #FF9800; color: white; }
+              .type-food { background-color: #9b0302; color: white; }
+              .type-waste { background-color: #9C27B0; color: white; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>🌍 MarianTrack Carbon Footprint Report</h1>
+              <p><strong>User:</strong> ${user?.email || 'N/A'}</p>
+              <p><strong>Report Generated:</strong> ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</p>
+            </div>
+
+            <div class="summary">
+              <h2>📊 Summary Statistics</h2>
+              <div class="stats-grid">
+                <div class="stat-box">
+                  <div class="stat-label">Total Activities</div>
+                  <div class="stat-value">${activities.length}</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Total Emissions</div>
+                  <div class="stat-value">${totalEmissions.toFixed(2)} kg</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Average per Activity</div>
+                  <div class="stat-value">${avgEmissions.toFixed(2)} kg</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Member Since</div>
+                  <div class="stat-value" style="font-size: 16px;">
+                    ${user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="breakdown">
+              <h2>📈 Emissions by Category</h2>
+              ${Object.entries(byType).map(([type, emissions]) => `
+                <div class="breakdown-item">
+                  <span><strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong></span>
+                  <span><strong>${emissions.toFixed(2)} kg CO₂</strong> (${((emissions / totalEmissions) * 100).toFixed(1)}%)</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div>
+              <h2>📋 Activity Details</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Emissions (kg CO₂)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${sortedActivities.map(activity => `
+                    <tr>
+                      <td>${new Date(activity.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                      <td><span class="type-badge type-${activity.type}">${activity.type}</span></td>
+                      <td>${activity.description}</td>
+                      <td><strong>${activity.emissionKg.toFixed(2)}</strong></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="footer">
+              <p><strong>MarianTrack</strong> - Carbon Footprint Tracker v1.0.0</p>
+              <p>Track your environmental impact and make a difference</p>
+            </div>
+          </body>
+        </html>
+      `;
+
+      // Generate PDF
+      const { uri } = await Print.printToFileAsync({ html });
+
+      // Share/Download the PDF
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Carbon Footprint Report',
+          UTI: 'com.adobe.pdf',
+        });
+        Alert.alert('Success', 'Your report has been generated and is ready to download!');
+      } else {
+        Alert.alert('Success', 'PDF generated successfully!');
+      }
     } catch (error) {
       console.error('Error exporting data:', error);
-      Alert.alert('Error', 'Failed to export data. Please try again.');
-    }
-  };
-
-  const toggleNotifications = () => {
-    setPreferences((prev) => ({
-      ...prev,
-      notifications: !prev.notifications,
-    }));
-  };
-
-  const handleUnitsChange = (newUnits: 'metric' | 'imperial') => {
-    setPreferences((prev) => ({
-      ...prev,
-      units: newUnits,
-    }));
-    setUnitsDialogVisible(false);
-  };
-
-  const handleManualSync = async () => {
-    if (!isConnected) {
-      Alert.alert('No Connection', 'Please connect to the internet to sync your data.');
-      return;
-    }
-
-    if (pendingCount === 0) {
-      Alert.alert('Already Synced', 'All your activities are already synced.');
-      return;
-    }
-
-    setSyncing(true);
-    try {
-      await syncPendingActivities();
-      Alert.alert('Success', 'Your activities have been synced successfully.');
-    } catch (error) {
-      Alert.alert('Sync Failed', 'Failed to sync activities. Please try again.');
+      Alert.alert('Error', 'Failed to generate PDF report. Please try again.');
     } finally {
-      setSyncing(false);
+      setExporting(false);
     }
   };
+
+
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -187,7 +295,7 @@ const ProfileScreen: React.FC = () => {
       <Card style={styles.card}>
         <Card.Content style={styles.userInfoContent}>
           <View style={styles.avatarContainer}>
-            <MaterialCommunityIcons name="account-circle" size={80} color="#4CAF50" />
+            <MaterialCommunityIcons name="account-circle" size={80} color="#9b0302" />
           </View>
           <Title style={styles.userName}>{user?.email}</Title>
           <Paragraph style={styles.userDetail}>
@@ -216,72 +324,6 @@ const ProfileScreen: React.FC = () => {
         </Card.Content>
       </Card>
 
-      {/* Settings Card */}
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.sectionTitle}>Settings</Title>
-
-          <List.Item
-            title="Units"
-            description={preferences.units === 'metric' ? 'Metric (kg, km)' : 'Imperial (lbs, miles)'}
-            left={(props) => <List.Icon {...props} icon="ruler" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            onPress={() => setUnitsDialogVisible(true)}
-            style={styles.listItem}
-          />
-
-          <Divider />
-
-          <List.Item
-            title="Notifications"
-            description="Receive reminders and insights"
-            left={(props) => <List.Icon {...props} icon="bell" />}
-            right={() => (
-              <Switch
-                value={preferences.notifications}
-                onValueChange={toggleNotifications}
-                color="#4CAF50"
-              />
-            )}
-            style={styles.listItem}
-          />
-        </Card.Content>
-      </Card>
-
-      {/* Sync Status Card */}
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.sectionTitle}>Sync Status</Title>
-
-          <View style={styles.syncStatusContainer}>
-            <View style={styles.syncStatusRow}>
-              <Text style={styles.syncStatusLabel}>Current Status:</Text>
-              <SyncStatusIndicator status={syncStatus} pendingCount={pendingCount} />
-            </View>
-
-            {pendingCount > 0 && (
-              <View style={styles.syncInfoContainer}>
-                <MaterialCommunityIcons name="information" size={16} color="#FF9800" />
-                <Text style={styles.syncInfoText}>
-                  {pendingCount} {pendingCount === 1 ? 'activity' : 'activities'} waiting to sync
-                </Text>
-              </View>
-            )}
-
-            <Button
-              mode="outlined"
-              onPress={handleManualSync}
-              icon="sync"
-              style={styles.syncButton}
-              disabled={!isConnected || syncing || pendingCount === 0}
-              loading={syncing}
-            >
-              {syncing ? 'Syncing...' : 'Sync Now'}
-            </Button>
-          </View>
-        </Card.Content>
-      </Card>
-
       {/* Data Management Card */}
       <Card style={styles.card}>
         <Card.Content>
@@ -289,10 +331,17 @@ const ProfileScreen: React.FC = () => {
 
           <List.Item
             title="Export Data"
-            description="Download your activity data"
-            left={(props) => <List.Icon {...props} icon="download" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            description="Download PDF report of your activities"
+            left={(props) => <List.Icon {...props} icon="file-pdf-box" />}
+            right={(props) =>
+              exporting ? (
+                <MaterialCommunityIcons name="loading" size={24} color="#9b0302" />
+              ) : (
+                <List.Icon {...props} icon="chevron-right" />
+              )
+            }
             onPress={handleExportData}
+            disabled={exporting || activities.length === 0}
             style={styles.listItem}
           />
         </Card.Content>
@@ -335,24 +384,7 @@ const ProfileScreen: React.FC = () => {
         </Dialog>
       </Portal>
 
-      {/* Units Selection Dialog */}
-      <Portal>
-        <Dialog visible={unitsDialogVisible} onDismiss={() => setUnitsDialogVisible(false)}>
-          <Dialog.Title>Select Units</Dialog.Title>
-          <Dialog.Content>
-            <RadioButton.Group
-              onValueChange={(value) => handleUnitsChange(value as 'metric' | 'imperial')}
-              value={preferences.units}
-            >
-              <RadioButton.Item label="Metric (kg, km)" value="metric" />
-              <RadioButton.Item label="Imperial (lbs, miles)" value="imperial" />
-            </RadioButton.Group>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setUnitsDialogVisible(false)}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+
     </ScrollView>
   );
 };
@@ -405,7 +437,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#9b0302',
     marginBottom: 4,
   },
   statLabel: {
