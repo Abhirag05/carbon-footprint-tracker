@@ -38,8 +38,8 @@ A React Native mobile application for tracking and analyzing personal carbon foo
    # Copy the example environment file
    cp .env.example .env
    
-   # Edit .env and add your Firebase credentials
-   # See ENVIRONMENT_SETUP.md for detailed instructions
+    # Edit .env and add your Firebase credentials
+    # See docs/FIREBASE_SETUP.md for detailed instructions
    ```
 
 4. **Start the development server**
@@ -61,12 +61,13 @@ The app requires Firebase configuration. Follow these steps:
 3. Update the `.env` file with your credentials
 4. Restart the development server
 
-**📖 For detailed setup instructions, see [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)**
+**📖 For detailed setup instructions, see [FIREBASE_SETUP.md](./docs/FIREBASE_SETUP.md)**
 
 ## Project Structure
 
 ```
 carbon-footprint-tracker/
+├── docs/                 # Project documentation and guides
 ├── src/
 │   ├── components/        # Reusable UI components
 │   ├── context/          # React Context providers
@@ -143,9 +144,11 @@ npm run build:ios:production
 
 ## Documentation
 
-- [Environment Setup Guide](./ENVIRONMENT_SETUP.md) - Detailed environment configuration
-- [UI Polish Guide](./UI_POLISH_GUIDE.md) - UI/UX features and guidelines
-- [UI Improvements Summary](./UI_IMPROVEMENTS_SUMMARY.md) - Recent UI enhancements
+All project documentation guides can be found in the [docs/](./docs) directory:
+- [Firebase Setup Guide](./docs/FIREBASE_SETUP.md) - Detailed environment configuration
+- [UI Polish Guide](./docs/UI_POLISH_GUIDE.md) - UI/UX features and guidelines
+- [UI Improvements Summary](./docs/UI_IMPROVEMENTS_SUMMARY.md) - Recent UI enhancements
+- [Security Overview](./docs/SECURITY.md) - Credential management and db security
 - [Assets Guide](./assets/README.md) - App icon and splash screen guidelines
 
 ## Security

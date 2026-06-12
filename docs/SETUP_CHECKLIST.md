@@ -199,9 +199,9 @@ npm run android
 
 ## Documentation Review
 
-- [ ] Read [README.md](./README.md)
-- [ ] Read [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)
-- [ ] Read [SECURITY.md](./SECURITY.md)
+- [ ] Read [README.md](../README.md)
+- [ ] Read [Firebase Setup Guide](./FIREBASE_SETUP.md)
+- [ ] Read [Security Overview](./SECURITY.md)
 - [ ] Understand project structure
 - [ ] Know where to find help
 
@@ -317,10 +317,10 @@ When adding a new team member:
 
 ## Resources
 
-- [README.md](./README.md) - Main documentation
-- [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment setup
-- [SECURITY.md](./SECURITY.md) - Security guidelines
-- [UI_POLISH_GUIDE.md](./UI_POLISH_GUIDE.md) - UI/UX features
+- [README.md](../README.md) - Main documentation
+- [Firebase Setup Guide](./FIREBASE_SETUP.md) - Environment setup
+- [Security Overview](./SECURITY.md) - Security guidelines
+- [UI Polish Guide](./UI_POLISH_GUIDE.md) - UI/UX features
 - [Expo Documentation](https://docs.expo.dev/)
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [React Native Documentation](https://reactnative.dev/)

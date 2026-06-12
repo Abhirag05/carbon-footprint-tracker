@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Auth, getAuth } from 'firebase/auth';
+import { Firestore, getFirestore } from 'firebase/firestore';
 import firebaseConfig from '../../firebase.config';
 import { logValidationResults } from '../utils/validateFirebaseConfig';
 
@@ -10,9 +10,9 @@ if (__DEV__) {
 }
 
 // Initialize Firebase
-let app;
-let auth;
-let db;
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 
 try {
   console.log('Initializing Firebase...');

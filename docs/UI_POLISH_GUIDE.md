@@ -184,7 +184,7 @@ Located in `app.json`:
 ```
 
 ### Asset Requirements
-See `assets/README.md` for detailed specifications:
+See `../assets/README.md` for detailed specifications:
 - App Icon: 1024x1024px
 - Adaptive Icon: 1024x1024px
 - Splash Screen: 1242x2436px

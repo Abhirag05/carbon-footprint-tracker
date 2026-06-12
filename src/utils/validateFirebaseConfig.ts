@@ -105,7 +105,7 @@ export const logValidationResults = (): void => {
       result.warnings.forEach(warning => console.warn(`  - ${warning}`));
     }
     
-    console.log('\nPlease follow the setup guide in FIREBASE_SETUP.md');
+    console.log('\nPlease follow the setup guide in docs/FIREBASE_SETUP.md');
   }
 };
 
@@ -116,7 +116,7 @@ export const getConfigErrorMessage = (): string | null => {
   const result = validateFirebaseConfig();
   
   if (!result.isValid) {
-    return 'Firebase is not configured. Please check FIREBASE_SETUP.md for setup instructions.';
+    return 'Firebase is not configured. Please check docs/FIREBASE_SETUP.md for setup instructions.';
   }
   
   return null;

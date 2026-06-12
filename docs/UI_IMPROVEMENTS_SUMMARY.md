@@ -85,7 +85,7 @@ This document summarizes the UI polish and user experience improvements implemen
 - `app.json` - Updated splash screen background color to primary green (#4CAF50)
 
 **Documentation Created**:
-- `assets/README.md` - Comprehensive guide for app icon and splash screen assets
+- `../assets/README.md` - Comprehensive guide for app icon and splash screen assets
 
 **Asset Specifications**:
 - App Icon: 1024x1024px PNG with transparency
@@ -106,9 +106,9 @@ This document summarizes the UI polish and user experience improvements implemen
 - All required packages are present in package.json
 
 **Documentation**:
-- Created `UI_POLISH_GUIDE.md` - Comprehensive guide for UI/UX features
-- Created `assets/README.md` - Asset creation and management guide
-- Created `UI_IMPROVEMENTS_SUMMARY.md` - This summary document
+- Created `./UI_POLISH_GUIDE.md` - Comprehensive guide for UI/UX features
+- Created `../assets/README.md` - Asset creation and management guide
+- Created `./UI_IMPROVEMENTS_SUMMARY.md` - This summary document
 
 ## Technical Details
 
@@ -147,9 +147,9 @@ Screen Detection → Scaling Calculation → Style Application
 1. `src/theme/theme.ts` - Theme configuration
 2. `src/utils/haptics.ts` - Haptic feedback utilities
 3. `src/utils/responsive.ts` - Responsive design utilities
-4. `assets/README.md` - Asset guidelines
-5. `UI_POLISH_GUIDE.md` - Comprehensive UI/UX guide
-6. `UI_IMPROVEMENTS_SUMMARY.md` - This summary
+4. `../assets/README.md` - Asset guidelines
+5. `./UI_POLISH_GUIDE.md` - Comprehensive UI/UX guide
+6. `./UI_IMPROVEMENTS_SUMMARY.md` - This summary
 
 ## Files Modified
 

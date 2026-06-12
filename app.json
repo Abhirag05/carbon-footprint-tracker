@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "carbon-footprint-tracker",
+    "name": "MarianTrack",
     "slug": "carbon-footprint-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,21 +8,21 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#9b0302"
     },
     "ios": {
-      "bundleIdentifier": "com.carbonfootprinttracker.app",
+      "bundleIdentifier": "com.mariantrack.app",
       "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.carbonfootprinttracker.app",
+      "package": "com.mariantrack.app",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#9b0302"
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
@@ -32,6 +32,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9a1e9e26-de81-4820-a255-726d62184342"
+      }
     }
   }
 }
